@@ -6,4 +6,6 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ meson ninja pkgconfig ];
   buildInputs = [ glib ];
+
+  postFixup = "ln -s $out/bin/triggerd $out/bin/trigger";
 }

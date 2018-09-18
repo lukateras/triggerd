@@ -13,13 +13,6 @@
     fail(#expr, errno);
 
 int main(gint argc, char **argv) {
-  if (argc < 2) {
-    g_message("Usage: %s <command>", *argv);
-    return EXIT_FAILURE;
-  }
-
-  argv++;
-
   g_autoptr(GSocket) sock =
       g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_DATAGRAM,
                    G_SOCKET_PROTOCOL_UDP, NULL);
@@ -36,23 +29,30 @@ int main(gint argc, char **argv) {
   g_autoptr(GSocketAddress) addr = G_SOCKET_ADDRESS(g_inet_socket_address_new(
       g_inet_address_new_loopback(G_SOCKET_FAMILY_IPV6), DEFAULT_PORT));
 
-  fail_if(g_socket_bind(sock, addr, TRUE, NULL) == FALSE);
+  g_autofree gchar *buf = g_malloc0(sock_min_rcvbuf);
 
-  gchar ack[sock_min_rcvbuf];
+  if (!g_strcmp0(g_basename(*argv++), "triggerd")) {
+    if (argc < 2)
+      return EXIT_FAILURE;
 
-  for (;;) {
-    g_socket_receive(sock, ack, sock_min_rcvbuf, NULL, NULL);
+    fail_if(g_socket_bind(sock, addr, TRUE, NULL) == FALSE);
 
-    pid_t cpid = fork();
+    for (;;) {
+      g_socket_receive(sock, buf, sock_min_rcvbuf, NULL, NULL);
 
-    if (cpid < 0)
-      fail("fork", errno);
+      pid_t cpid = fork();
 
-    else if (cpid == 0) {
-      fail_if(execvp(*argv, argv));
+      if (cpid < 0)
+        fail("fork", errno);
+
+      else if (cpid == 0) {
+        fail_if(execvp(*argv, argv));
+      }
+
+      else
+        fail_if(waitpid(cpid, NULL, 0) != cpid);
     }
-
-    else
-      fail_if(waitpid(cpid, NULL, 0) != cpid);
+  } else {
+    fail_if(g_socket_send_to(sock, addr, buf, sock_min_rcvbuf, NULL, NULL) < 0);
   }
 }
