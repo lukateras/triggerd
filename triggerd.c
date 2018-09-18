@@ -20,8 +20,9 @@ int main(gint argc, char **argv) {
 
   argv++;
 
-  GSocket *sock = g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_DATAGRAM,
-                               G_SOCKET_PROTOCOL_UDP, NULL);
+  g_autoptr(GSocket) sock =
+      g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_DATAGRAM,
+                   G_SOCKET_PROTOCOL_UDP, NULL);
 
   if (sock == NULL)
     fail("g_socket_new", errno);
@@ -29,9 +30,10 @@ int main(gint argc, char **argv) {
   gint sock_min_rcvbuf;
 
   fail_if(g_socket_set_option(sock, SOL_SOCKET, SO_RCVBUF, 0, NULL) == FALSE);
-  fail_if(g_socket_get_option(sock, SOL_SOCKET, SO_RCVBUF, &sock_min_rcvbuf, NULL) == FALSE);
+  fail_if(g_socket_get_option(sock, SOL_SOCKET, SO_RCVBUF, &sock_min_rcvbuf,
+                              NULL) == FALSE);
 
-  GSocketAddress *addr = G_SOCKET_ADDRESS(g_inet_socket_address_new(
+  g_autoptr(GSocketAddress) addr = G_SOCKET_ADDRESS(g_inet_socket_address_new(
       g_inet_address_new_loopback(G_SOCKET_FAMILY_IPV6), DEFAULT_PORT));
 
   fail_if(g_socket_bind(sock, addr, TRUE, NULL) == FALSE);
