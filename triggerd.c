@@ -13,6 +13,13 @@
     fail(#expr, errno);
 
 int main(gint argc, char **argv) {
+  if (argc < 2) {
+    g_message("Usage: %s <command>", *argv);
+    return EXIT_FAILURE;
+  }
+
+  argv++;
+
   GSocket *sock = g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_DATAGRAM,
                                G_SOCKET_PROTOCOL_UDP, NULL);
 
