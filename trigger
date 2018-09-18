@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-head -c $(cat /proc/sys/net/core/rmem_default) /dev/zero > /dev/udp/localhost/50494
+head -c "$(< /proc/sys/net/core/rmem_default)" /dev/zero > /dev/udp/localhost/51161
