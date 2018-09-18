@@ -6,6 +6,4 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ meson ninja pkgconfig ];
   buildInputs = [ glib ];
-
-  postInstall = "install -Dt $out/bin $src/trigger";
 }
