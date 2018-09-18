@@ -30,8 +30,9 @@ int main(gint argc, char **argv) {
       g_inet_address_new_loopback(G_SOCKET_FAMILY_IPV6), DEFAULT_PORT));
 
   g_autofree gchar *buf = g_malloc0(sock_min_rcvbuf);
+  g_autofree gchar *self = g_path_get_basename(*argv++);
 
-  if (!g_strcmp0(g_basename(*argv++), "triggerd")) {
+  if (!g_strcmp0(self, "triggerd")) {
     if (argc < 2)
       return EXIT_FAILURE;
 
