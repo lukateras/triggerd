@@ -1,4 +1,4 @@
-with import <nixpkgs> {};
+{ pkgs ? import ./pkgs.nix }: with pkgs;
 
 stdenv.mkDerivation {
   name = "triggerd";
