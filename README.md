@@ -1,5 +1,3 @@
-# triggerd
-
 A UDP based activation mechanism.
 
 When daemon receives a packet, it runs an arbitrary program from its ARGV using
