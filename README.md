@@ -1,4 +1,4 @@
-A UDP based activation mechanism.
+## Overview
 
 When daemon receives a packet, it runs an arbitrary program from its ARGV using
 `execvp(3)`. While the program keeps running, there is just one slot that can
@@ -20,8 +20,8 @@ creation, inferring `SOCK_MIN_RCVBUF`) is shared between the two.
 
 [SOCK_MIN_RCVBUF]: https://github.com/torvalds/linux/blob/v4.19-rc4/include/net/sock.h#L2185 
 
-This is a very opinionated queue mechanism and should be used only when
-appropriate. It has been designed for continuous deployment via `triggerd
-nixos-rebuild switch`, where one can enqueue a rebuild just by sending a UDP
-packet, while at the same rebuilding only once for any N of consecutive
-requests.
+## Rationale
+
+It has been designed for continuous deployment via `triggerd nixos-rebuild
+switch`, where one can enqueue a rebuild just by sending a UDP packet, while
+at the same rebuilding only once for any N of consecutive requests.
