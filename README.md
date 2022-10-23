@@ -1,27 +1,69 @@
+![trigger + triggerd](logo.svg)
+
+Simplistic UDP-based scheduler with a single slot queue.
+
+I hope that you find `trigger` + `triggerd` useful 💚💜
+
+## Installation
+
+- Arch Linux: [`triggerd`]() (AUR)
+- macOS: [`yanalunaterra/triggerd`]() (Homebrew tap)
+
+## Example
+
+```sh
+$ triggerd make &
+
+$ trigger # Schedule a build
+$ trigger # Schedule another build
+          # (Make will be restarted upon completion)
+$ trigger # Attempt to schedule yet another build
+          # (has no effect if Make is still running)
+```
+
 ## Overview
 
-When daemon receives a packet, it runs an arbitrary program from its ARGV using
-`execvp(3)`. While the program keeps running, there is just one slot that can
-take another packet. If that slot is occupied, immediately after program quits,
-it will be started again.
+`triggerd` listens on IPv6 loopback UDP port 51161 (overridable by setting
+`TRIGGERD_PORT` environment variable).
 
-Packet contents are not processed in any way. In other words, UDP is used for
-signaling, not for data transfer.
+When `triggerd` receives a packet, it executes a program from its command-line
+arguments. While this program keeps running, there is a single slot that can
+take another packet. If the slot is taken by the time the program exits, it will
+be immediately restarted. Once the slot is taken, additional received packets
+have no effect until the program is restarted and the slot is emptied.
 
-Additional packets after the first one will be discarded.
+`trigger` sends a packet to `triggerd`.
 
-Comes with `trigger`, a client that sends a UDP packet to the daemon. You can
-also send packets from any other program, but do mind that packet size should
-be equal to [`SOCK_MIN_RCVBUF`][SOCK_MIN_RCVBUF].
+For details, consult `trigger(1)` and `triggerd(8)` man pages.
 
-Together, `trigger` and `triggerd` form a multi-call binary: the former is just
-a symlink to the latter. The reason is that most code (socket setup, address
-creation, inferring `SOCK_MIN_RCVBUF`) is shared between the two.
+## Attribution
 
-[SOCK_MIN_RCVBUF]: https://github.com/torvalds/linux/blob/v4.19-rc4/include/net/sock.h#L2185 
+Prototype sponsored by [Serokell][].
 
-## Rationale
+[Clone Rounded PE][] logo font by Lasko Džurovski from [Rosetta Type Foundry][].
 
-It has been designed for continuous deployment via `triggerd nixos-rebuild
-switch`, where one can enqueue a rebuild just by sending a UDP packet, while
-at the same rebuilding only once for any N of consecutive requests.
+On/off switch logo icon by [Tanya Nevskaya][].
+
+Social preview background pattern by Steve Schoger from [Hero Patterns][],
+licensed under [CC BY 4.0][].
+
+[Serokell]: https://serokell.io
+[Clone Rounded PE]: https://rosettatype.com/CloneRoundedPE
+[Tanya Nevskaya]: https://unparalloser.com
+[Rosetta Type Foundry]: https://rosettatype.com
+[Hero Patterns]: https://heropatterns.com
+[CC BY 4.0]: https://creativecommons.org/licenses/by/4.0/
+
+---
+
+`trigger` + `triggerd` were designed for continuous deployment on [NixOS][]:
+`triggerd nixos-rebuild switch` rebuilds the system on request while
+deduplicating consecutive rebuild requests; `trigger` requests a system
+rebuild.
+
+One caveat to be aware of: all users on a system typically have access to UDP.
+Do not use `triggerd` with anything that can lead to privilege escalation. If
+internal denial-of-service is a concern for you, set up a firewall policy that
+limits `triggerd` port access to a trusted group.
+
+[NixOS]: https://nixos.org

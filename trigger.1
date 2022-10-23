@@ -1,0 +1,25 @@
+.Dd October 24, 2022
+.Dt TRIGGER 1
+.Sh NAME
+.Nm trigger
+.Nd activate
+.Xr triggerd 8
+.Sh SYNOPSIS
+.Nm
+.Sh DESCRIPTION
+.Nm
+sends a UDP packet to
+.Xr triggerd 8 .
+.Sh ENVIRONMENT
+.Bl -tag -width TRIGGERD_PORT
+.It Ev TRIGGERD_PORT
+UDP port to send the packet to. Default: 51161
+.Sh EXIT STATUS
+Other than the standard success and failure exit codes, 64 means that
+.Nm
+there was an issue.
+.Sh SEE ALSO
+.Xr triggerd 8
+.Sh AUTHORS
+Written by
+.An Yana Luna-Terra Aq Mt yana@riseup.net .
